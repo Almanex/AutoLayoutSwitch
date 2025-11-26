@@ -16,6 +16,22 @@ namespace AutoLayoutSwitch
         private List<int> _currentWordVkCodes = new List<int>(); // Store VK codes
         private readonly HashSet<char> _enVowels = new HashSet<char> { 'a', 'e', 'i', 'o', 'u', 'y', 'A', 'E', 'I', 'O', 'U', 'Y' };
         private readonly HashSet<char> _ruVowels = new HashSet<char> { 'а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я', 'А', 'Е', 'Ё', 'И', 'О', 'У', 'Ы', 'Э', 'Ю', 'Я' };
+        private readonly Dictionary<char, char> _enToRu = new Dictionary<char, char>
+        {
+            // Top row
+            ['q'] = 'й', ['w'] = 'ц', ['e'] = 'у', ['r'] = 'к', ['t'] = 'е', ['y'] = 'н', ['u'] = 'г', ['i'] = 'ш', ['o'] = 'щ', ['p'] = 'з', ['['] = 'х', [']'] = 'ъ',
+            ['Q'] = 'Й', ['W'] = 'Ц', ['E'] = 'У', ['R'] = 'К', ['T'] = 'Е', ['Y'] = 'Н', ['U'] = 'Г', ['I'] = 'Ш', ['O'] = 'Щ', ['P'] = 'З', ['{'] = 'Х', ['}'] = 'Ъ',
+            // Home row
+            ['a'] = 'ф', ['s'] = 'ы', ['d'] = 'в', ['f'] = 'а', ['g'] = 'п', ['h'] = 'р', ['j'] = 'о', ['k'] = 'л', ['l'] = 'д', [';'] = 'ж', ['\''] = 'э',
+            ['A'] = 'Ф', ['S'] = 'Ы', ['D'] = 'В', ['F'] = 'А', ['G'] = 'П', ['H'] = 'Р', ['J'] = 'О', ['K'] = 'Л', ['L'] = 'Д', [':'] = 'Ж', ['"'] = 'Э',
+            // Bottom row
+            ['z'] = 'я', ['x'] = 'ч', ['c'] = 'с', ['v'] = 'м', ['b'] = 'и', ['n'] = 'т', ['m'] = 'ь', [','] = 'б', ['.'] = 'ю', ['/'] = '.',
+            ['Z'] = 'Я', ['X'] = 'Ч', ['C'] = 'С', ['V'] = 'М', ['B'] = 'И', ['N'] = 'Т', ['M'] = 'Ь', ['<'] = 'Б', ['>'] = 'Ю', ['?'] = ','
+        };
+        private readonly HashSet<string> _ruShortWhitelist = new HashSet<string>
+        {
+            "не","то","на","по","да","но","же","ли","и","в","с","тд","тд.","т.п","т.п.","тп","тп.","итд","и тд","и т.п"
+        };
         
         public bool Enabled { get => _enabled; set => _enabled = value; }
 
@@ -171,6 +187,37 @@ namespace AutoLayoutSwitch
                 {
                     _currentWord.Append(c);
                     _currentWordVkCodes.Add(vkCode);
+                }
+
+                // Эвристика: короткие русские слова, набранные в EN раскладке (<=4 символов)
+                if (isEnLayout && _currentWord.Length >= 2 && _currentWord.Length <= 4)
+                {
+                    string enWord = _currentWord.ToString();
+                    string ruMapped = MapEnToRu(enWord);
+                    string ruNormalized = ruMapped.Replace(" ", string.Empty);
+                    if (_ruShortWhitelist.Contains(ruNormalized))
+                    {
+                        Log($"Heuristic: Short RU word from EN mapping '{enWord}' -> '{ruMapped}'. Switching to RU.");
+                        SwitchToLanguage(0x19);
+                        RewriteLastWord(true);
+                        ClearWord();
+                        return true;
+                    }
+                    bool allMappable = true;
+                    foreach (char ch in enWord) { if (!_enToRu.ContainsKey(ch)) { allMappable = false; break; } }
+                    if (allMappable)
+                    {
+                        bool ruHasVowel = false;
+                        foreach (char wc in ruMapped) { if (_ruVowels.Contains(wc)) { ruHasVowel = true; break; } }
+                        if (ruHasVowel)
+                        {
+                            Log($"Heuristic: EN→RU mapped word '{enWord}' has RU vowel(s). Switching to RU.");
+                            SwitchToLanguage(0x19);
+                            RewriteLastWord(true);
+                            ClearWord();
+                            return true;
+                        }
+                    }
                 }
 
                 // Эвристика 3: Слово без гласных (для "ghbdtn" -> "привет", "rfr" -> "как")
@@ -385,6 +432,16 @@ namespace AutoLayoutSwitch
                 File.AppendAllText(_logPath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {msg}{Environment.NewLine}");
             }
             catch { }
+        }
+        private string MapEnToRu(string s)
+        {
+            var sb = new StringBuilder(s.Length);
+            foreach (char ch in s)
+            {
+                if (_enToRu.TryGetValue(ch, out char ru)) sb.Append(ru);
+                else sb.Append(ch);
+            }
+            return sb.ToString();
         }
     }
 }
