@@ -43,18 +43,17 @@ namespace AutoLayoutSwitch
             Padding = new Padding(12);
 
             var tlp = new TableLayoutPanel();
-            tlp.ColumnCount = 2;
+            tlp.ColumnCount = 1;
             tlp.RowCount = 6;
             tlp.Dock = DockStyle.Fill;
             tlp.AutoSize = false;
-            tlp.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70));
-            tlp.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
-            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            tlp.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tlp.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));  // row 0: sound
+            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));  // row 1: autostart
+            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));  // row 2: hotkey area
+            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));  // row 3: exceptions label
+            tlp.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // row 4: exceptions box fill
+            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));  // row 5: buttons
 
             _chkPlaySound = new CheckBox();
             _chkPlaySound.Text = "Звук при переключении";
@@ -70,16 +69,25 @@ namespace AutoLayoutSwitch
             tlp.Controls.Add(_chkAutoStart, 0, 1);
             tlp.SetColumnSpan(_chkAutoStart, 2);
 
+            var hotkeyGrid = new TableLayoutPanel();
+            hotkeyGrid.ColumnCount = 3;
+            hotkeyGrid.RowCount = 1;
+            hotkeyGrid.Dock = DockStyle.Fill;
+            hotkeyGrid.AutoSize = true;
+            hotkeyGrid.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            hotkeyGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            hotkeyGrid.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+
             var lblHkTitle = new Label();
             lblHkTitle.Text = "Горячая клавиша исправления:";
             lblHkTitle.AutoSize = true;
             lblHkTitle.Margin = new Padding(4, 8, 4, 4);
-            tlp.Controls.Add(lblHkTitle, 0, 2);
 
-            var hotkeyPanel = new FlowLayoutPanel();
-            hotkeyPanel.FlowDirection = FlowDirection.RightToLeft;
-            hotkeyPanel.Dock = DockStyle.Fill;
-            hotkeyPanel.AutoSize = true;
+            _lblHotkey = new Label();
+            _lblHotkey.Text = "Shift + F12";
+            _lblHotkey.AutoSize = true;
+            _lblHotkey.Font = new Font(Font, FontStyle.Bold);
+            _lblHotkey.Margin = new Padding(12, 8, 4, 4);
 
             _btnSetHotkey = new Button();
             _btnSetHotkey.Text = "Изменить...";
@@ -89,22 +97,16 @@ namespace AutoLayoutSwitch
             _btnSetHotkey.Margin = new Padding(4);
             _btnSetHotkey.Click += BtnSetHotkey_Click;
 
-            _lblHotkey = new Label();
-            _lblHotkey.Text = "Shift + F12";
-            _lblHotkey.AutoSize = true;
-            _lblHotkey.Font = new Font(Font, FontStyle.Bold);
-            _lblHotkey.Margin = new Padding(4, 10, 8, 0);
-
-            hotkeyPanel.Controls.Add(_btnSetHotkey);
-            hotkeyPanel.Controls.Add(_lblHotkey);
-            tlp.Controls.Add(hotkeyPanel, 1, 2);
+            hotkeyGrid.Controls.Add(lblHkTitle, 0, 0);
+            hotkeyGrid.Controls.Add(_lblHotkey, 1, 0);
+            hotkeyGrid.Controls.Add(_btnSetHotkey, 2, 0);
+            tlp.Controls.Add(hotkeyGrid, 0, 2);
 
             var lblEx = new Label();
             lblEx.Text = "Исключения (по одному в строке):";
             lblEx.AutoSize = true;
             lblEx.Margin = new Padding(4, 12, 4, 4);
             tlp.Controls.Add(lblEx, 0, 3);
-            tlp.SetColumnSpan(lblEx, 2);
 
             _txtExceptions = new TextBox();
             _txtExceptions.Multiline = true;
@@ -112,7 +114,6 @@ namespace AutoLayoutSwitch
             _txtExceptions.Dock = DockStyle.Fill;
             _txtExceptions.Margin = new Padding(4);
             tlp.Controls.Add(_txtExceptions, 0, 4);
-            tlp.SetColumnSpan(_txtExceptions, 2);
 
             var buttonsPanel = new FlowLayoutPanel();
             buttonsPanel.FlowDirection = FlowDirection.RightToLeft;
@@ -130,7 +131,6 @@ namespace AutoLayoutSwitch
 
             buttonsPanel.Controls.Add(_btnSave);
             tlp.Controls.Add(buttonsPanel, 0, 5);
-            tlp.SetColumnSpan(buttonsPanel, 2);
 
             Controls.Add(tlp);
             AcceptButton = _btnSave;
