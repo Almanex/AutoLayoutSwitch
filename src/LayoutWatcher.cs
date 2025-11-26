@@ -69,7 +69,7 @@ namespace AutoLayoutSwitch
 
         public bool OnKeyPress(int vkCode, int scanCode)
         {
-            if (!_enabled || _profileMgr == null) return false;
+            if (!_enabled) return false;
 
             // Обработка Backspace (VK_BACK = 0x08)
             if (vkCode == 0x08) 
@@ -369,7 +369,7 @@ namespace AutoLayoutSwitch
             int count = _currentWordVkCodes.Count;
             // If we suppress the current key, the app hasn't received it yet.
             // So we need to backspace (count - 1) times.
-            int backspaces = suppressCurrent ? count - 1 : count;
+            int backspaces = count;
             
             Log($"Rewriting {count} chars (suppress={suppressCurrent}, BS={backspaces})...");
 
