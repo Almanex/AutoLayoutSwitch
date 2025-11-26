@@ -32,11 +32,11 @@ namespace AutoLayoutSwitch
         private void InitializeComponent()
         {
             this.Text = "Настройки AutoLayoutSwitch";
-            this.Size = new Size(520, 560);
+            this.Size = new Size(700, 600);
             this.FormBorderStyle = FormBorderStyle.Sizable;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new Size(420, 480);
+            this.MinimumSize = new Size(520, 520);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             this.AutoScaleMode = AutoScaleMode.Dpi;
@@ -50,8 +50,8 @@ namespace AutoLayoutSwitch
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
             _chkPlaySound = new CheckBox();
