@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace AutoLayoutSwitch
 {
@@ -13,6 +14,7 @@ namespace AutoLayoutSwitch
         static Settings? _settings;
         static IntPtr _hWnd;
         static Win32.NOTIFYICONDATA _nid;
+        static Icon? _trayIconManaged;
         
         const int WM_TRAYICON = Win32.WM_USER + 1;
         const int WM_COMMAND = 0x0111;
@@ -63,6 +65,7 @@ namespace AutoLayoutSwitch
                 // Очистка ресурсов при выходе
                 Win32.UnregisterHotKey(_hWnd, ID_HOTKEY);
                 Win32.Shell_NotifyIcon(Win32.NIM_DELETE, ref _nid);
+                _trayIconManaged?.Dispose();
                 _hook.Dispose();
             }
         }
@@ -114,14 +117,27 @@ namespace AutoLayoutSwitch
             _nid.uCallbackMessage = WM_TRAYICON;
             _nid.szTip = "AutoLayoutSwitch";
 
-            // Try load icon from file
-            IntPtr hIcon = Win32.LoadImage(IntPtr.Zero, "icon.ico", Win32.IMAGE_ICON, 16, 16, Win32.LR_LOADFROMFILE);
-            if (hIcon == IntPtr.Zero)
+            // Try load icon from embedded resource first
+            var asm = typeof(Program).Assembly;
+            using (var stream = asm.GetManifestResourceStream("AutoLayoutSwitch.icon.ico"))
             {
-                // Fallback to system application icon
-                 hIcon = LoadIcon(IntPtr.Zero, (IntPtr)32512); // IDI_APPLICATION
+                if (stream != null)
+                {
+                    _trayIconManaged = new Icon(stream, new Size(16, 16));
+                    _nid.hIcon = _trayIconManaged.Handle;
+                }
+                else
+                {
+                    // Fallback: try load from file next to exe
+                    IntPtr hIconFile = Win32.LoadImage(IntPtr.Zero, "icon.ico", Win32.IMAGE_ICON, 16, 16, Win32.LR_LOADFROMFILE);
+                    if (hIconFile == IntPtr.Zero)
+                    {
+                        // Final fallback to system application icon
+                        hIconFile = LoadIcon(IntPtr.Zero, (IntPtr)32512); // IDI_APPLICATION
+                    }
+                    _nid.hIcon = hIconFile;
+                }
             }
-            _nid.hIcon = hIcon;
 
             Win32.Shell_NotifyIcon(Win32.NIM_ADD, ref _nid);
         }
