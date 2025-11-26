@@ -31,95 +31,83 @@ namespace AutoLayoutSwitch
 
         private void InitializeComponent()
         {
-            Text = "Настройки AutoLayoutSwitch";
-            Size = new Size(520, 560);
-            FormBorderStyle = FormBorderStyle.Sizable;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            MinimumSize = new Size(420, 480);
-            StartPosition = FormStartPosition.CenterScreen;
-            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-            AutoScaleMode = AutoScaleMode.Dpi;
-            Padding = new Padding(12);
+            this.Text = "Настройки AutoLayoutSwitch";
+            this.Size = new Size(520, 560);
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.MinimumSize = new Size(420, 480);
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            this.AutoScaleMode = AutoScaleMode.Dpi;
 
-            var tlp = new TableLayoutPanel();
-            tlp.ColumnCount = 1;
-            tlp.RowCount = 6;
-            tlp.Dock = DockStyle.Fill;
-            tlp.AutoSize = false;
-            tlp.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));  // row 0: sound
-            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));  // row 1: autostart
-            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));  // row 2: hotkey area
-            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));  // row 3: exceptions label
-            tlp.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // row 4: exceptions box fill
-            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));  // row 5: buttons
+            var root = new TableLayoutPanel();
+            root.Dock = DockStyle.Fill;
+            root.Padding = new Padding(16);
+            root.ColumnCount = 1;
+            root.RowCount = 7;
+            root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
+            root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
             _chkPlaySound = new CheckBox();
             _chkPlaySound.Text = "Звук при переключении";
             _chkPlaySound.AutoSize = true;
-            _chkPlaySound.Margin = new Padding(4);
-            tlp.Controls.Add(_chkPlaySound, 0, 0);
-            tlp.SetColumnSpan(_chkPlaySound, 2);
+            root.Controls.Add(_chkPlaySound, 0, 0);
 
             _chkAutoStart = new CheckBox();
             _chkAutoStart.Text = "Запускать вместе с Windows";
             _chkAutoStart.AutoSize = true;
-            _chkAutoStart.Margin = new Padding(4);
-            tlp.Controls.Add(_chkAutoStart, 0, 1);
-            tlp.SetColumnSpan(_chkAutoStart, 2);
-
-            var hotkeyGrid = new TableLayoutPanel();
-            hotkeyGrid.ColumnCount = 3;
-            hotkeyGrid.RowCount = 1;
-            hotkeyGrid.Dock = DockStyle.Fill;
-            hotkeyGrid.AutoSize = true;
-            hotkeyGrid.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-            hotkeyGrid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            hotkeyGrid.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            root.Controls.Add(_chkAutoStart, 0, 1);
 
             var lblHkTitle = new Label();
             lblHkTitle.Text = "Горячая клавиша исправления:";
             lblHkTitle.AutoSize = true;
-            lblHkTitle.Margin = new Padding(4, 8, 4, 4);
+            root.Controls.Add(lblHkTitle, 0, 2);
+
+            var hotkeyRow = new FlowLayoutPanel();
+            hotkeyRow.AutoSize = true;
+            hotkeyRow.FlowDirection = FlowDirection.LeftToRight;
+            hotkeyRow.WrapContents = false;
+            hotkeyRow.Margin = new Padding(0, 4, 0, 8);
 
             _lblHotkey = new Label();
             _lblHotkey.Text = "Shift + F12";
             _lblHotkey.AutoSize = true;
-            _lblHotkey.Font = new Font(Font, FontStyle.Bold);
-            _lblHotkey.Margin = new Padding(12, 8, 4, 4);
+            _lblHotkey.Font = new Font(this.Font, FontStyle.Bold);
+            _lblHotkey.Margin = new Padding(0, 6, 12, 6);
+            hotkeyRow.Controls.Add(_lblHotkey);
 
             _btnSetHotkey = new Button();
             _btnSetHotkey.Text = "Изменить...";
             _btnSetHotkey.AutoSize = true;
             _btnSetHotkey.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             _btnSetHotkey.Padding = new Padding(10, 6, 10, 6);
-            _btnSetHotkey.Margin = new Padding(4);
             _btnSetHotkey.Click += BtnSetHotkey_Click;
+            hotkeyRow.Controls.Add(_btnSetHotkey);
 
-            hotkeyGrid.Controls.Add(lblHkTitle, 0, 0);
-            hotkeyGrid.Controls.Add(_lblHotkey, 1, 0);
-            hotkeyGrid.Controls.Add(_btnSetHotkey, 2, 0);
-            tlp.Controls.Add(hotkeyGrid, 0, 2);
+            root.Controls.Add(hotkeyRow, 0, 3);
 
             var lblEx = new Label();
             lblEx.Text = "Исключения (по одному в строке):";
             lblEx.AutoSize = true;
-            lblEx.Margin = new Padding(4, 12, 4, 4);
-            tlp.Controls.Add(lblEx, 0, 3);
+            root.Controls.Add(lblEx, 0, 4);
 
             _txtExceptions = new TextBox();
             _txtExceptions.Multiline = true;
             _txtExceptions.ScrollBars = ScrollBars.Vertical;
             _txtExceptions.Dock = DockStyle.Fill;
-            _txtExceptions.Margin = new Padding(4);
-            tlp.Controls.Add(_txtExceptions, 0, 4);
+            root.Controls.Add(_txtExceptions, 0, 5);
 
-            var buttonsPanel = new FlowLayoutPanel();
-            buttonsPanel.FlowDirection = FlowDirection.RightToLeft;
-            buttonsPanel.Dock = DockStyle.Fill;
-            buttonsPanel.AutoSize = true;
-            buttonsPanel.Margin = new Padding(4);
+            var bottomRow = new FlowLayoutPanel();
+            bottomRow.FlowDirection = FlowDirection.RightToLeft;
+            bottomRow.Dock = DockStyle.Fill;
+            bottomRow.Padding = new Padding(0);
+            bottomRow.Margin = new Padding(0, 12, 0, 0);
 
             _btnSave = new Button();
             _btnSave.Text = "Сохранить";
@@ -128,14 +116,13 @@ namespace AutoLayoutSwitch
             _btnSave.Padding = new Padding(20, 10, 20, 10);
             _btnSave.DialogResult = DialogResult.OK;
             _btnSave.Click += BtnSave_Click;
+            bottomRow.Controls.Add(_btnSave);
 
-            buttonsPanel.Controls.Add(_btnSave);
-            tlp.Controls.Add(buttonsPanel, 0, 5);
+            root.Controls.Add(bottomRow, 0, 6);
+            this.Controls.Add(root);
 
-            Controls.Add(tlp);
-            AcceptButton = _btnSave;
-            KeyPreview = true;
-            KeyDown += SettingsForm_KeyDown;
+            this.KeyPreview = true;
+            this.KeyDown += SettingsForm_KeyDown;
         }
 
         private void LoadSettings()
