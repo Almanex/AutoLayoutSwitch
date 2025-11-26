@@ -119,11 +119,8 @@ namespace AutoLayoutSwitch
                     }
                     else
                     {
-                        // Other punctuation (e.g. !) might be a separator or just ignored
-                        // Let's treat them as separators to be safe and clear buffer
-                        // isSeparator = true; 
-                        // Actually, better to just NOT add them to word, but NOT clear.
-                        // But for now, let's stick to clearing on explicit separators.
+                        // Treat other punctuation as separators (e.g. '-' ':') to reset word boundaries
+                        isSeparator = true;
                     }
                 }
 
@@ -191,6 +188,32 @@ namespace AutoLayoutSwitch
                 {
                     _currentWord.Append(c);
                     _currentWordVkCodes.Add(vkCode);
+                }
+
+                // Heuristic: EN word that maps to RU and starts with common RU prefixes (handles concatenated words like 'yt'+'dsikj')
+                if (isEnLayout && _currentWord.Length >= 4)
+                {
+                    string enWord = _currentWord.ToString();
+                    bool allMappable = true;
+                    foreach (char ch in enWord) { if (!char.IsLetter(ch) || !_enToRu.ContainsKey(ch)) { allMappable = false; break; } }
+                    if (allMappable)
+                    {
+                        string ruMapped = MapEnToRu(enWord);
+                        string ruLower = ruMapped.ToLowerInvariant();
+                        if (StartsWithRuPrefix(ruLower))
+                        {
+                            bool ruHasVowel = false;
+                            foreach (char wc in ruMapped) { if (_ruVowels.Contains(wc)) { ruHasVowel = true; break; } }
+                            if (ruHasVowel)
+                            {
+                                Log($"Heuristic: EN→RU mapped word with RU prefix '{enWord}' -> '{ruMapped}'. Switching to RU.");
+                                SwitchToLanguage(0x19);
+                                RewriteLastWord(true);
+                                ClearWord();
+                                return true;
+                            }
+                        }
+                    }
                 }
 
                 // Эвристика: короткие русские слова, набранные в EN раскладке (<=4 символов)
@@ -477,6 +500,20 @@ namespace AutoLayoutSwitch
                 else sb.Append(ch);
             }
             return sb.ToString();
+        }
+
+        private bool StartsWithRuPrefix(string s)
+        {
+            // Common RU prefixes/particles
+            string[] prefixes = new [] {
+                "не","что","как","или","при","без","для","над","под","это","от",
+                "уже","ещё","еще","так","там","про","со","об","из","во","ко"
+            };
+            foreach (var p in prefixes)
+            {
+                if (s.StartsWith(p)) return true;
+            }
+            return false;
         }
     }
 }
