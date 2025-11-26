@@ -15,6 +15,7 @@ namespace AutoLayoutSwitch
         static IntPtr _hWnd;
         static Win32.NOTIFYICONDATA _nid;
         static Icon? _trayIconManaged;
+        static Icon? _windowIcon;
         
         const int WM_TRAYICON = Win32.WM_USER + 1;
         const int WM_COMMAND = 0x0111;
@@ -124,17 +125,19 @@ namespace AutoLayoutSwitch
             {
                 if (stream != null)
                 {
-                    _trayIconManaged = new Icon(stream, new Size(16, 16));
-                    _nid.hIcon = _trayIconManaged.Handle;
+                    using (var baseIcon = new Icon(stream))
+                    {
+                        _trayIconManaged = new Icon(baseIcon, new Size(16, 16));
+                        _windowIcon = new Icon(baseIcon, new Size(32, 32));
+                        _nid.hIcon = _trayIconManaged.Handle;
+                    }
                 }
                 else
                 {
-                    // Fallback: try load from file next to exe
                     IntPtr hIconFile = Win32.LoadImage(IntPtr.Zero, "icon.ico", Win32.IMAGE_ICON, 16, 16, Win32.LR_LOADFROMFILE);
                     if (hIconFile == IntPtr.Zero)
                     {
-                        // Final fallback to system application icon
-                        hIconFile = LoadIcon(IntPtr.Zero, (IntPtr)32512); // IDI_APPLICATION
+                        hIconFile = LoadIcon(IntPtr.Zero, (IntPtr)32512);
                     }
                     _nid.hIcon = hIconFile;
                 }
@@ -218,6 +221,11 @@ namespace AutoLayoutSwitch
             SetForegroundWindow(_hWnd);
             Win32.TrackPopupMenu(hMenu, Win32.TPM_RIGHTBUTTON, pt.X, pt.Y, 0, _hWnd, IntPtr.Zero);
             Win32.DestroyMenu(hMenu);
+        }
+
+        public static Icon? GetWindowIcon()
+        {
+            return _windowIcon;
         }
 
         static void OpenSettings()

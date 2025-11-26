@@ -32,13 +32,11 @@ namespace AutoLayoutSwitch
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
-            const int WM_SETICON = 0x0080;
-            const int ICON_SMALL = 0;
-            const int ICON_BIG = 1;
-            Win32.SetClassLongPtr(this.Handle, Win32.GCLP_HICON, IntPtr.Zero);
-            Win32.SetClassLongPtr(this.Handle, Win32.GCLP_HICONSM, IntPtr.Zero);
-            Win32.SendMessage(this.Handle, WM_SETICON, (IntPtr)ICON_SMALL, IntPtr.Zero);
-            Win32.SendMessage(this.Handle, WM_SETICON, (IntPtr)ICON_BIG, IntPtr.Zero);
+            var icon = Program.GetWindowIcon();
+            if (icon != null)
+            {
+                this.Icon = icon;
+            }
         }
 
         private void InitializeComponent()
@@ -50,8 +48,8 @@ namespace AutoLayoutSwitch
             this.MinimizeBox = false;
             this.MinimumSize = new Size(520, 520);
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.Icon = null;
-            this.ShowIcon = false;
+            this.ShowIcon = true;
+            this.Icon = Program.GetWindowIcon();
             this.AutoScaleMode = AutoScaleMode.Dpi;
 
             var root = new TableLayoutPanel();
