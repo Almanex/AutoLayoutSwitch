@@ -38,7 +38,7 @@ namespace AutoLayoutSwitch
             this.MinimizeBox = false;
             this.MinimumSize = new Size(520, 520);
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            this.ShowIcon = false;
             this.AutoScaleMode = AutoScaleMode.Dpi;
 
             var root = new TableLayoutPanel();
