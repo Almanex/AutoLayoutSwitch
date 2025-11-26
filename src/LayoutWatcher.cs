@@ -220,6 +220,36 @@ namespace AutoLayoutSwitch
                     }
                 }
 
+                if (isEnLayout && _currentWord.Length >= 5 && _currentWord.Length <= 12)
+                {
+                    string enWord = _currentWord.ToString();
+                    bool allLetters = true;
+                    foreach (char ch in enWord) { if (!char.IsLetter(ch)) { allLetters = false; break; } }
+                    if (allLetters)
+                    {
+                        bool allMappable = true;
+                        foreach (char ch in enWord) { if (!_enToRu.ContainsKey(ch)) { allMappable = false; break; } }
+                        if (allMappable)
+                        {
+                            string ruMapped = MapEnToRu(enWord);
+                            int enVowelCount = 0;
+                            foreach (char wc in enWord) { if (_enVowels.Contains(wc)) enVowelCount++; }
+                            bool ruHasVowel = false;
+                            foreach (char wc in ruMapped) { if (_ruVowels.Contains(wc)) { ruHasVowel = true; break; } }
+                            bool ruHasHardChars = false;
+                            foreach (char wc in ruMapped) { if (wc=='ы'||wc=='ш'||wc=='щ'||wc=='ж'||wc=='ю'||wc=='я'||wc=='й'||wc=='э'||wc=='ь'||wc=='ъ'||wc=='ё'||wc=='Ы'||wc=='Ш'||wc=='Щ'||wc=='Ж'||wc=='Ю'||wc=='Я'||wc=='Й'||wc=='Э'||wc=='Ь'||wc=='Ъ'||wc=='Ё') { ruHasHardChars = true; break; } }
+                            if (ruHasVowel && ruHasHardChars && enVowelCount <= 1)
+                            {
+                                Log($"Heuristic: EN→RU mapped long word '{enWord}' -> '{ruMapped}'. Switching to RU.");
+                                SwitchToLanguage(0x19);
+                                RewriteLastWord(true);
+                                ClearWord();
+                                return true;
+                            }
+                        }
+                    }
+                }
+
                 // Эвристика 3: Слово без гласных (для "ghbdtn" -> "привет", "rfr" -> "как")
                 if (_currentWord.Length >= 3)
                 {
