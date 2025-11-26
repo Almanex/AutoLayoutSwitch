@@ -28,14 +28,7 @@ namespace AutoLayoutSwitch
             ['z'] = 'я', ['x'] = 'ч', ['c'] = 'с', ['v'] = 'м', ['b'] = 'и', ['n'] = 'т', ['m'] = 'ь', [','] = 'б', ['.'] = 'ю', ['/'] = '.',
             ['Z'] = 'Я', ['X'] = 'Ч', ['C'] = 'С', ['V'] = 'М', ['B'] = 'И', ['N'] = 'Т', ['M'] = 'Ь', ['<'] = 'Б', ['>'] = 'Ю', ['?'] = ','
         };
-        private readonly HashSet<string> _ruShortWhitelist = new HashSet<string>
-        {
-            "не","то","на","по","да","но","же","ли","и","в","с",
-            "от","как","или","при","без","для","над","под","это","во","ко","из","изо","со","об","обо","про",
-            "если","либо","тоже","чтоб","что","так","там","уже","ещё","еще","ну","уж","а",
-            "он","она","они","его","ее","её","их","кто","где","чем","чья","чьи",
-            "тд","тд.","т.п","т.п.","тп","тп.","итд","и тд","и т.п"
-        };
+        private readonly HashSet<string> _ruShortWhitelist = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         
         public bool Enabled { get => _enabled; set => _enabled = value; }
 
@@ -48,6 +41,7 @@ namespace AutoLayoutSwitch
         public LayoutWatcher(Settings settings)
         {
             _settings = settings;
+            foreach (var s in _settings.RuShortWhitelist) _ruShortWhitelist.Add(s);
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             string dir = Path.Combine(appData, "AutoLayoutSwitch");
             Directory.CreateDirectory(dir);
@@ -504,12 +498,7 @@ namespace AutoLayoutSwitch
 
         private bool StartsWithRuPrefix(string s)
         {
-            // Common RU prefixes/particles
-            string[] prefixes = new [] {
-                "не","что","как","или","при","без","для","над","под","это","от",
-                "уже","ещё","еще","так","там","про","со","об","из","во","ко"
-            };
-            foreach (var p in prefixes)
+            foreach (var p in _settings.RuPrefixes)
             {
                 if (s.StartsWith(p)) return true;
             }

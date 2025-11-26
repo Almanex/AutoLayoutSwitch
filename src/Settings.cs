@@ -19,6 +19,21 @@ namespace AutoLayoutSwitch
             "dev", "sys", "log", "cfg", "ini", "url", "api", "sdk", "ide", "gui", "cli", "ssh", "ssl", "ftp", "tcp", "udp", "dns", "http", "www"
         };
 
+        public List<string> RuShortWhitelist { get; set; } = new List<string>
+        {
+            "не","то","на","по","да","но","же","ли","и","в","с",
+            "от","как","или","при","без","для","над","под","это","во","ко","из","изо","со","об","обо","про",
+            "если","либо","тоже","чтоб","что","так","там","уже","ещё","еще","ну","уж","а",
+            "он","она","они","его","ее","её","их","кто","где","чем","чья","чьи",
+            "тд","тд.","т.п","т.п.","тп","тп.","итд","и тд","и т.п"
+        };
+
+        public List<string> RuPrefixes { get; set; } = new List<string>
+        {
+            "не","что","как","или","при","без","для","над","под","это","от",
+            "уже","ещё","еще","так","там","про","со","об","из","во","ко"
+        };
+
         private static string SettingsPath => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), 
             "AutoLayoutSwitch", 
