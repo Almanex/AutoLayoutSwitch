@@ -7,12 +7,12 @@ namespace AutoLayoutSwitch
 {
     public class SettingsForm : Form
     {
-        private CheckBox _chkPlaySound;
-        private CheckBox _chkAutoStart;
-        private Label _lblHotkey;
-        private Button _btnSetHotkey;
-        private TextBox _txtExceptions;
-        private Button _btnSave;
+        private CheckBox _chkPlaySound = null!;
+        private CheckBox _chkAutoStart = null!;
+        private Label _lblHotkey = null!;
+        private Button _btnSetHotkey = null!;
+        private TextBox _txtExceptions = null!;
+        private Button _btnSave = null!;
         private Settings _settings;
         
         private int _tempHotkeyVk;
@@ -38,6 +38,7 @@ namespace AutoLayoutSwitch
             this.MinimizeBox = false;
             this.MinimumSize = new Size(520, 520);
             this.StartPosition = FormStartPosition.CenterScreen;
+            this.Icon = null;
             this.ShowIcon = false;
             this.AutoScaleMode = AutoScaleMode.Dpi;
 

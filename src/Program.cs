@@ -66,7 +66,8 @@ namespace AutoLayoutSwitch
                 Win32.UnregisterHotKey(_hWnd, ID_HOTKEY);
                 Win32.Shell_NotifyIcon(Win32.NIM_DELETE, ref _nid);
                 _trayIconManaged?.Dispose();
-                _hook.Dispose();
+                if (_hook != null)
+                    _hook.Dispose();
             }
         }
 
@@ -178,7 +179,10 @@ namespace AutoLayoutSwitch
                     }
                     else if (id == IDM_TOGGLE)
                     {
-                        _watcher!.Enabled = !_watcher.Enabled;
+                        if (_watcher != null)
+                        {
+                            _watcher.Enabled = !_watcher.Enabled;
+                        }
                     }
                     else if (id == IDM_SETTINGS)
                     {
@@ -202,7 +206,7 @@ namespace AutoLayoutSwitch
             IntPtr hMenu = Win32.CreatePopupMenu();
             
             int flags = MF_STRING;
-            if (_watcher!.Enabled) flags |= MF_CHECKED;
+            if (_watcher != null && _watcher.Enabled) flags |= MF_CHECKED;
             
             Win32.AppendMenu(hMenu, flags, IDM_TOGGLE, "Включить авто-переключение");
             Win32.AppendMenu(hMenu, MF_STRING, IDM_SETTINGS, "Настройки");
@@ -230,12 +234,14 @@ namespace AutoLayoutSwitch
                     ManageAutoStart(_settings!.AutoStart);
                     
                     // Re-register hotkey
-                    Win32.RegisterHotKey(_hWnd, ID_HOTKEY, _settings.HotKeyModifiers, (uint)_settings.HotKeyVk);
+                    if (_settings != null)
+                        Win32.RegisterHotKey(_hWnd, ID_HOTKEY, _settings.HotKeyModifiers, (uint)_settings.HotKeyVk);
                 }
                 else
                 {
                     // If canceled, just re-register old hotkey
-                    Win32.RegisterHotKey(_hWnd, ID_HOTKEY, _settings.HotKeyModifiers, (uint)_settings.HotKeyVk);
+                    if (_settings != null)
+                        Win32.RegisterHotKey(_hWnd, ID_HOTKEY, _settings.HotKeyModifiers, (uint)_settings.HotKeyVk);
                 }
             }
         }
