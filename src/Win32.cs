@@ -204,6 +204,15 @@ namespace AutoLayoutSwitch
         [DllImport("user32.dll")]
         public static extern bool PostMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", EntryPoint = "SetClassLongPtr")]
+        public static extern IntPtr SetClassLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+        public const int GCLP_HICON = -14;
+        public const int GCLP_HICONSM = -34;
+
         [DllImport("user32.dll")]
         public static extern bool MessageBeep(uint uType);
 

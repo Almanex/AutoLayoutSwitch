@@ -35,8 +35,10 @@ namespace AutoLayoutSwitch
             const int WM_SETICON = 0x0080;
             const int ICON_SMALL = 0;
             const int ICON_BIG = 1;
-            Win32.PostMessage(this.Handle, WM_SETICON, (IntPtr)ICON_SMALL, IntPtr.Zero);
-            Win32.PostMessage(this.Handle, WM_SETICON, (IntPtr)ICON_BIG, IntPtr.Zero);
+            Win32.SetClassLongPtr(this.Handle, Win32.GCLP_HICON, IntPtr.Zero);
+            Win32.SetClassLongPtr(this.Handle, Win32.GCLP_HICONSM, IntPtr.Zero);
+            Win32.SendMessage(this.Handle, WM_SETICON, (IntPtr)ICON_SMALL, IntPtr.Zero);
+            Win32.SendMessage(this.Handle, WM_SETICON, (IntPtr)ICON_BIG, IntPtr.Zero);
         }
 
         private void InitializeComponent()
