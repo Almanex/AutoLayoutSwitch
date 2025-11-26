@@ -30,14 +30,11 @@ namespace AutoLayoutSwitch
         };
         private readonly HashSet<string> _ruShortWhitelist = new HashSet<string>
         {
-            // базовые союзы/предлоги
             "не","то","на","по","да","но","же","ли","и","в","с",
-            // добавленные частые
-            "от","как","или","при","без","для","над","под","это",
-            // 4-буквенные
-            "если","либо","тоже","чтоб",
-            // сокращения
-            "тд","тд.","т.п","т.п.","тп","тп.","итд","и тд","и т.п","что"
+            "от","как","или","при","без","для","над","под","это","во","ко","из","изо","со","об","обо","про",
+            "если","либо","тоже","чтоб","что","так","там","уже","ещё","еще","ну","уж","а",
+            "он","она","они","его","ее","её","их","кто","где","чем","чья","чьи",
+            "тд","тд.","т.п","т.п.","тп","тп.","итд","и тд","и т.п"
         };
         
         public bool Enabled { get => _enabled; set => _enabled = value; }
@@ -202,7 +199,8 @@ namespace AutoLayoutSwitch
                     string enWord = _currentWord.ToString();
                     string ruMapped = MapEnToRu(enWord);
                     string ruNormalized = ruMapped.Replace(" ", string.Empty);
-                    if (_ruShortWhitelist.Contains(ruNormalized))
+                    string ruLower = ruNormalized.ToLowerInvariant();
+                    if (_ruShortWhitelist.Contains(ruLower))
                     {
                         Log($"Heuristic: Short RU word from EN mapping '{enWord}' -> '{ruMapped}'. Switching to RU.");
                         SwitchToLanguage(0x19);
