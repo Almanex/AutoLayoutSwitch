@@ -9,8 +9,6 @@ namespace AutoLayoutSwitch
     {
         public bool PlaySound { get; set; } = true;
         public bool AutoStart { get; set; } = false;
-        public int HotKeyVk { get; set; } = 0x7B; // VK_F12
-        public uint HotKeyModifiers { get; set; } = 0x0004; // MOD_SHIFT
         public HashSet<string> Exceptions { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
         { 
             "hmm", "shh", "brr", "grr", "pfft", "psst", "tsk", "zzz", 

@@ -20,13 +20,11 @@ namespace AutoLayoutSwitch
         const int WM_TRAYICON = Win32.WM_USER + 1;
         const int WM_COMMAND = 0x0111;
         const int WM_DESTROY = 0x0002;
-        const int WM_HOTKEY = 0x0312;
         
         const int ID_TRAYICON = 1001;
         const int IDM_EXIT = 1002;
         const int IDM_TOGGLE = 1003;
         const int IDM_SETTINGS = 1005;
-        const int ID_HOTKEY = 1004;
         
         const int MF_CHECKED = 0x0008;
         const int MF_UNCHECKED = 0x0000;
@@ -58,13 +56,12 @@ namespace AutoLayoutSwitch
                 CreateMessageWindow();
                 CreateTrayIcon();
                 
-                // Register Hotkey from settings (Default: Shift + F12)
-                Win32.RegisterHotKey(_hWnd, ID_HOTKEY, _settings.HotKeyModifiers, (uint)_settings.HotKeyVk);
+                
 
                 RunMessageLoop();
 
                 // Очистка ресурсов при выходе
-                Win32.UnregisterHotKey(_hWnd, ID_HOTKEY);
+                
                 Win32.Shell_NotifyIcon(Win32.NIM_DELETE, ref _nid);
                 _trayIconManaged?.Dispose();
                 if (_hook != null)
@@ -161,12 +158,7 @@ namespace AutoLayoutSwitch
                     }
                     break;
                 
-                case WM_HOTKEY:
-                    if (wParam == (IntPtr)ID_HOTKEY)
-                    {
-                        _watcher?.ManualSwitch();
-                    }
-                    break;
+                
 
                 case WM_COMMAND:
                     int id = (int)wParam & 0xFFFF;
@@ -224,9 +216,6 @@ namespace AutoLayoutSwitch
 
         static void OpenSettings()
         {
-            // Unregister hotkey while settings are open to avoid conflicts
-            Win32.UnregisterHotKey(_hWnd, ID_HOTKEY);
-
             using (var form = new SettingsForm(_settings!))
             {
                 if (form.ShowDialog() == DialogResult.OK)
@@ -234,16 +223,9 @@ namespace AutoLayoutSwitch
                     // Settings are saved inside the form
                     // Reload/Apply effects
                     ManageAutoStart(_settings!.AutoStart);
-                    
-                    // Re-register hotkey
-                    if (_settings != null)
-                        Win32.RegisterHotKey(_hWnd, ID_HOTKEY, _settings.HotKeyModifiers, (uint)_settings.HotKeyVk);
                 }
                 else
                 {
-                    // If canceled, just re-register old hotkey
-                    if (_settings != null)
-                        Win32.RegisterHotKey(_hWnd, ID_HOTKEY, _settings.HotKeyModifiers, (uint)_settings.HotKeyVk);
                 }
             }
         }

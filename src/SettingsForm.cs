@@ -9,23 +9,19 @@ namespace AutoLayoutSwitch
     {
         private CheckBox _chkPlaySound = null!;
         private CheckBox _chkAutoStart = null!;
-        private Label _lblHotkey = null!;
-        private Button _btnSetHotkey = null!;
+        
         private TextBox _txtExceptions = null!;
         private TextBox _txtRuShort = null!;
         private TextBox _txtRuPrefixes = null!;
         private Button _btnSave = null!;
         private Settings _settings;
         
-        private int _tempHotkeyVk;
-        private uint _tempHotkeyMod;
-        private bool _waitingForKey;
+        
 
         public SettingsForm(Settings settings)
         {
             _settings = settings;
-            _tempHotkeyVk = settings.HotKeyVk;
-            _tempHotkeyMod = settings.HotKeyModifiers;
+            
 
             InitializeComponent();
             LoadSettings();
@@ -77,33 +73,7 @@ namespace AutoLayoutSwitch
             _chkAutoStart.AutoSize = true;
             root.Controls.Add(_chkAutoStart, 0, 1);
 
-            var lblHkTitle = new Label();
-            lblHkTitle.Text = "Горячая клавиша исправления:";
-            lblHkTitle.AutoSize = true;
-            root.Controls.Add(lblHkTitle, 0, 2);
-
-            var hotkeyRow = new FlowLayoutPanel();
-            hotkeyRow.AutoSize = true;
-            hotkeyRow.FlowDirection = FlowDirection.LeftToRight;
-            hotkeyRow.WrapContents = false;
-            hotkeyRow.Margin = new Padding(0, 4, 0, 8);
-
-            _lblHotkey = new Label();
-            _lblHotkey.Text = "Shift + F12";
-            _lblHotkey.AutoSize = true;
-            _lblHotkey.Font = new Font(this.Font, FontStyle.Bold);
-            _lblHotkey.Margin = new Padding(0, 6, 12, 6);
-            hotkeyRow.Controls.Add(_lblHotkey);
-
-            _btnSetHotkey = new Button();
-            _btnSetHotkey.Text = "Изменить...";
-            _btnSetHotkey.AutoSize = true;
-            _btnSetHotkey.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            _btnSetHotkey.Padding = new Padding(10, 6, 10, 6);
-            _btnSetHotkey.Click += BtnSetHotkey_Click;
-            hotkeyRow.Controls.Add(_btnSetHotkey);
-
-            root.Controls.Add(hotkeyRow, 0, 3);
+            
 
             var lblEx = new Label();
             lblEx.Text = "Исключения (по одному в строке):";
@@ -147,7 +117,7 @@ namespace AutoLayoutSwitch
             _txtRuPrefixes.Dock = DockStyle.Fill;
             ruPanel.Controls.Add(_txtRuPrefixes, 1, 1);
 
-            root.Controls.Add(ruPanel, 0, 6);
+            root.Controls.Add(ruPanel, 0, 3);
 
             var bottomRow = new FlowLayoutPanel();
             bottomRow.FlowDirection = FlowDirection.RightToLeft;
@@ -167,8 +137,7 @@ namespace AutoLayoutSwitch
             root.Controls.Add(bottomRow, 0, 7);
             this.Controls.Add(root);
 
-            this.KeyPreview = true;
-            this.KeyDown += SettingsForm_KeyDown;
+            
         }
 
         private void LoadSettings()
@@ -178,56 +147,15 @@ namespace AutoLayoutSwitch
             _txtExceptions.Text = string.Join(Environment.NewLine, _settings.Exceptions);
             _txtRuShort.Text = string.Join(Environment.NewLine, _settings.RuShortWhitelist);
             _txtRuPrefixes.Text = string.Join(Environment.NewLine, _settings.RuPrefixes);
-            UpdateHotkeyLabel();
         }
 
-        private void UpdateHotkeyLabel()
-        {
-            string mod = "";
-            if ((_tempHotkeyMod & Win32.MOD_CONTROL) != 0) mod += "Ctrl + ";
-            if ((_tempHotkeyMod & Win32.MOD_SHIFT) != 0) mod += "Shift + ";
-            if ((_tempHotkeyMod & Win32.MOD_ALT) != 0) mod += "Alt + ";
-            
-            Keys key = (Keys)_tempHotkeyVk;
-            _lblHotkey.Text = mod + key.ToString();
-        }
-
-        private void BtnSetHotkey_Click(object? sender, EventArgs e)
-        {
-            _btnSetHotkey.Text = "Нажмите клавиши...";
-            _btnSetHotkey.Enabled = false;
-            _waitingForKey = true;
-            this.Focus();
-        }
-
-        private void SettingsForm_KeyDown(object? sender, KeyEventArgs e)
-        {
-            if (_waitingForKey)
-            {
-                // Ignore modifier keys alone
-                if (e.KeyCode == Keys.ControlKey || e.KeyCode == Keys.ShiftKey || e.KeyCode == Keys.Menu)
-                    return;
-
-                _tempHotkeyVk = (int)e.KeyCode;
-                _tempHotkeyMod = 0;
-                if (e.Control) _tempHotkeyMod |= Win32.MOD_CONTROL;
-                if (e.Shift) _tempHotkeyMod |= Win32.MOD_SHIFT;
-                if (e.Alt) _tempHotkeyMod |= Win32.MOD_ALT;
-
-                UpdateHotkeyLabel();
-                _waitingForKey = false;
-                _btnSetHotkey.Text = "Изменить...";
-                _btnSetHotkey.Enabled = true;
-                e.Handled = true;
-            }
-        }
+        
 
         private void BtnSave_Click(object? sender, EventArgs e)
         {
             _settings.PlaySound = _chkPlaySound.Checked;
             _settings.AutoStart = _chkAutoStart.Checked;
-            _settings.HotKeyVk = _tempHotkeyVk;
-            _settings.HotKeyModifiers = _tempHotkeyMod;
+            
 
             _settings.Exceptions.Clear();
             var lines = _txtExceptions.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
