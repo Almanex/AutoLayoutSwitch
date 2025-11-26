@@ -120,27 +120,21 @@ namespace AutoLayoutSwitch
             _nid.szTip = "AutoLayoutSwitch";
 
             // Try load icon from embedded resource first
-            var asm = typeof(Program).Assembly;
-            using (var stream = asm.GetManifestResourceStream("AutoLayoutSwitch.icon.ico"))
+            Icon? exeIcon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            if (exeIcon != null)
             {
-                if (stream != null)
+                _trayIconManaged = new Icon(exeIcon, new Size(16, 16));
+                _windowIcon = new Icon(exeIcon, new Size(32, 32));
+                _nid.hIcon = _trayIconManaged.Handle;
+            }
+            else
+            {
+                IntPtr hIconFile = Win32.LoadImage(IntPtr.Zero, "icon.ico", Win32.IMAGE_ICON, 16, 16, Win32.LR_LOADFROMFILE);
+                if (hIconFile == IntPtr.Zero)
                 {
-                    using (var baseIcon = new Icon(stream))
-                    {
-                        _trayIconManaged = new Icon(baseIcon, new Size(16, 16));
-                        _windowIcon = new Icon(baseIcon, new Size(32, 32));
-                        _nid.hIcon = _trayIconManaged.Handle;
-                    }
+                    hIconFile = LoadIcon(IntPtr.Zero, (IntPtr)32512);
                 }
-                else
-                {
-                    IntPtr hIconFile = Win32.LoadImage(IntPtr.Zero, "icon.ico", Win32.IMAGE_ICON, 16, 16, Win32.LR_LOADFROMFILE);
-                    if (hIconFile == IntPtr.Zero)
-                    {
-                        hIconFile = LoadIcon(IntPtr.Zero, (IntPtr)32512);
-                    }
-                    _nid.hIcon = hIconFile;
-                }
+                _nid.hIcon = hIconFile;
             }
 
             Win32.Shell_NotifyIcon(Win32.NIM_ADD, ref _nid);
