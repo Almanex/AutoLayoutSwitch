@@ -31,90 +31,111 @@ namespace AutoLayoutSwitch
 
         private void InitializeComponent()
         {
-            this.Text = "Настройки AutoLayoutSwitch";
-            this.Size = new Size(500, 550);
-            this.FormBorderStyle = FormBorderStyle.Sizable;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.MinimumSize = new Size(400, 450);
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            Text = "Настройки AutoLayoutSwitch";
+            Size = new Size(520, 560);
+            FormBorderStyle = FormBorderStyle.Sizable;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            MinimumSize = new Size(420, 480);
+            StartPosition = FormStartPosition.CenterScreen;
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            AutoScaleMode = AutoScaleMode.Dpi;
+            Padding = new Padding(12);
 
-            int y = 20;
+            var tlp = new TableLayoutPanel();
+            tlp.ColumnCount = 2;
+            tlp.RowCount = 6;
+            tlp.Dock = DockStyle.Fill;
+            tlp.AutoSize = false;
+            tlp.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70));
+            tlp.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
+            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tlp.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
             _chkPlaySound = new CheckBox();
             _chkPlaySound.Text = "Звук при переключении";
-            _chkPlaySound.Location = new Point(20, y);
             _chkPlaySound.AutoSize = true;
-            this.Controls.Add(_chkPlaySound);
-
-            y += 30;
+            _chkPlaySound.Margin = new Padding(4);
+            tlp.Controls.Add(_chkPlaySound, 0, 0);
+            tlp.SetColumnSpan(_chkPlaySound, 2);
 
             _chkAutoStart = new CheckBox();
             _chkAutoStart.Text = "Запускать вместе с Windows";
-            _chkAutoStart.Location = new Point(20, y);
             _chkAutoStart.AutoSize = true;
-            this.Controls.Add(_chkAutoStart);
+            _chkAutoStart.Margin = new Padding(4);
+            tlp.Controls.Add(_chkAutoStart, 0, 1);
+            tlp.SetColumnSpan(_chkAutoStart, 2);
 
-            y += 40;
-
-            Label lblHkTitle = new Label();
+            var lblHkTitle = new Label();
             lblHkTitle.Text = "Горячая клавиша исправления:";
-            lblHkTitle.Location = new Point(20, y);
             lblHkTitle.AutoSize = true;
-            this.Controls.Add(lblHkTitle);
+            lblHkTitle.Margin = new Padding(4, 8, 4, 4);
+            tlp.Controls.Add(lblHkTitle, 0, 2);
 
-            y += 25;
-
-            _lblHotkey = new Label();
-            _lblHotkey.Text = "Shift + F12"; // Placeholder
-            _lblHotkey.Location = new Point(20, y + 5);
-            _lblHotkey.AutoSize = true;
-            _lblHotkey.Font = new Font(this.Font, FontStyle.Bold);
-            this.Controls.Add(_lblHotkey);
+            var hotkeyPanel = new FlowLayoutPanel();
+            hotkeyPanel.FlowDirection = FlowDirection.RightToLeft;
+            hotkeyPanel.Dock = DockStyle.Fill;
+            hotkeyPanel.AutoSize = true;
 
             _btnSetHotkey = new Button();
             _btnSetHotkey.Text = "Изменить...";
-            _btnSetHotkey.Location = new Point(150, y);
             _btnSetHotkey.AutoSize = true;
             _btnSetHotkey.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            _btnSetHotkey.Padding = new Padding(10, 5, 10, 5);
+            _btnSetHotkey.Padding = new Padding(10, 6, 10, 6);
+            _btnSetHotkey.Margin = new Padding(4);
             _btnSetHotkey.Click += BtnSetHotkey_Click;
-            this.Controls.Add(_btnSetHotkey);
 
-            y += 40;
+            _lblHotkey = new Label();
+            _lblHotkey.Text = "Shift + F12";
+            _lblHotkey.AutoSize = true;
+            _lblHotkey.Font = new Font(Font, FontStyle.Bold);
+            _lblHotkey.Margin = new Padding(4, 10, 8, 0);
 
-            Label lblEx = new Label();
+            hotkeyPanel.Controls.Add(_btnSetHotkey);
+            hotkeyPanel.Controls.Add(_lblHotkey);
+            tlp.Controls.Add(hotkeyPanel, 1, 2);
+
+            var lblEx = new Label();
             lblEx.Text = "Исключения (по одному в строке):";
-            lblEx.Location = new Point(20, y);
             lblEx.AutoSize = true;
-            this.Controls.Add(lblEx);
-
-            y += 25;
+            lblEx.Margin = new Padding(4, 12, 4, 4);
+            tlp.Controls.Add(lblEx, 0, 3);
+            tlp.SetColumnSpan(lblEx, 2);
 
             _txtExceptions = new TextBox();
             _txtExceptions.Multiline = true;
             _txtExceptions.ScrollBars = ScrollBars.Vertical;
-            _txtExceptions.Location = new Point(20, y);
-            _txtExceptions.Size = new Size(440, 200);
-            _txtExceptions.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
-            this.Controls.Add(_txtExceptions);
+            _txtExceptions.Dock = DockStyle.Fill;
+            _txtExceptions.Margin = new Padding(4);
+            tlp.Controls.Add(_txtExceptions, 0, 4);
+            tlp.SetColumnSpan(_txtExceptions, 2);
 
-            y += 220;
+            var buttonsPanel = new FlowLayoutPanel();
+            buttonsPanel.FlowDirection = FlowDirection.RightToLeft;
+            buttonsPanel.Dock = DockStyle.Fill;
+            buttonsPanel.AutoSize = true;
+            buttonsPanel.Margin = new Padding(4);
 
             _btnSave = new Button();
             _btnSave.Text = "Сохранить";
             _btnSave.AutoSize = true;
             _btnSave.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             _btnSave.Padding = new Padding(20, 10, 20, 10);
-            _btnSave.Location = new Point(this.ClientSize.Width - 150, y);
-            _btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             _btnSave.DialogResult = DialogResult.OK;
             _btnSave.Click += BtnSave_Click;
-            this.Controls.Add(_btnSave);
-            
-            this.KeyPreview = true;
-            this.KeyDown += SettingsForm_KeyDown;
+
+            buttonsPanel.Controls.Add(_btnSave);
+            tlp.Controls.Add(buttonsPanel, 0, 5);
+            tlp.SetColumnSpan(buttonsPanel, 2);
+
+            Controls.Add(tlp);
+            AcceptButton = _btnSave;
+            KeyPreview = true;
+            KeyDown += SettingsForm_KeyDown;
         }
 
         private void LoadSettings()
